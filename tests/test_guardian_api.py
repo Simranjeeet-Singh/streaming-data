@@ -34,6 +34,24 @@ class TestGuardianAPI(unittest.TestCase):
         self.assertEqual(len(articles), 1)
         self.assertEqual(articles[0]['webTitle'], "Sample Article")
         self.assertEqual(articles[0]['webUrl'], "https://www.theguardian.com/sample-article")
+    
+    @patch('src.guardian_api.requests.get')
+    def test_get_guardian_articles_invalid_key(self, mock_get):
+        # Mock a failed API response due to invalid API key
+        mock_response = MagicMock()
+        mock_response.status_code = 403  # Forbidden, likely due to invalid key
+
+        mock_get.return_value = mock_response
+
+        api_key = "invalid_api_key"
+        search_term = "test"
+        
+        with self.assertRaises(Exception) as context:
+            get_guardian_articles(api_key, search_term)
+
+        self.assertTrue("Guardian API request failed" in str(context.exception))
+   
+    
 
 if __name__ == "__main__":
     unittest.main()
