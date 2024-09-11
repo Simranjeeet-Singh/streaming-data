@@ -52,6 +52,26 @@ class TestGuardianAPI(unittest.TestCase):
         self.assertTrue("Guardian API request failed" in str(context.exception))
    
     
+    @patch('src.guardian_api.requests.get')
+    def test_get_guardian_articles_no_results(self, mock_get):
+        # Mock a successful API response with no results
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "response": {
+                "status": "ok",
+                "results": []  # No articles returned
+            }
+        }
+
+        mock_get.return_value = mock_response
+
+        api_key = "test_api_key"
+        search_term = "no-results-term"
+        articles = get_guardian_articles(api_key, search_term)
+
+        # Check that the returned list is empty
+        self.assertEqual(articles, [])
 
 if __name__ == "__main__":
     unittest.main()
