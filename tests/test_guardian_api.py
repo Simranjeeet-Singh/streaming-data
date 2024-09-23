@@ -48,6 +48,9 @@ class TestGuardianAPI(unittest.TestCase):
         
         with self.assertRaises(Exception) as context:
             get_guardian_articles(api_key, search_term)
+        print(f"Exception message: {context}")
+        print(f"dir(context): {dir(context)}")
+        print(f"vars(context): {vars(context)}")
 
         self.assertTrue("Guardian API request failed" in str(context.exception))
    
