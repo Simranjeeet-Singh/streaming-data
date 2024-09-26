@@ -7,6 +7,7 @@ class TestIntegration(unittest.TestCase):
 
     @patch('boto3.client')
     @patch('requests.get')
+    @patch.dict(os.environ, {"GUARDIAN_API_KEY": "test_api_key", "SQS_QUEUE_NAME": "test_queue_name"})  # Mock environment variables
     def test_lambda_handler(self, mock_requests_get, mock_boto3_client):
         # Mock Guardian API response
         mock_response = MagicMock()
