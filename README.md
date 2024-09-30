@@ -1,111 +1,106 @@
 Streaming Data Project
-Overview
+Project Overview
 
-This project fetches articles from The Guardian API and publishes them to AWS SQS. It uses AWS Lambda and API Gateway for serverless architecture and Terraform for infrastructure deployment.
-Features
+This project retrieves articles from The Guardian API based on user-defined search terms and posts them to an AWS SQS queue using AWS Lambda and API Gateway. The project is designed to be deployed on AWS infrastructure using Terraform for infrastructure management.
+Key Features
 
-    Fetches up to 10 recent articles from The Guardian API using a search term.
-    Publishes article data to an AWS SQS queue.
-    Automates infrastructure setup using Terraform and Makefile.
+    Fetches up to 10 articles from The Guardian API.
+    Publishes articles in JSON format to an AWS SQS queue.
+    Fully deployable using Terraform and AWS Lambda.
+    Supports user input via API Gateway, ideal for integration into larger data platforms.
 
-Prerequisites
+Requirements
 
-    Python 3.x
-    AWS Account and configured AWS CLI
-    Terraform installed
-    Guardian API key (free-tier available)
+    Python 3.9 or above.
+    AWS Account with appropriate IAM permissions for Lambda, SQS, and API Gateway.
+    Terraform v1.0 or later installed on your local machine.
+    The Guardian API key.
 
-Setup Instructions
+Installation and Setup
 1. Clone the Repository
 
 bash
 
-git clone <your-forked-repo-url>
+git clone https://github.com/Simranjeeet-Singh/streaming-data.git
 cd streaming-data
 
-2. Install Python Dependencies
+2. Environment Setup
 
-Create a virtual environment and install dependencies:
+Ensure your system has pip and Python 3.9+. Install the necessary Python dependencies:
 
 bash
 
-python3 -m venv venv
-source venv/bin/activate
 pip install -r requirements.txt
 
-3. Configure AWS and Guardian API
+3. Configure AWS Credentials
 
-Ensure AWS CLI is configured:
+Ensure that your AWS credentials are configured properly. This can be done by using the AWS CLI:
 
 bash
 
 aws configure
 
-Set the Guardian API key in the environment:
+4. Set Up API Key and Deploy
+
+The deployment process requires the Guardian API key. To deploy the project, you can pass the key via the CLI using the following make command:
 
 bash
 
-export GUARDIAN_API_KEY=<your-guardian-api-key>
+make deploy-lambda API_KEY=your_guardian_api_key
 
-4. Deploy with Terraform
+This will:
 
-Use the provided Makefile to zip the Lambda package and apply Terraform:
+    Install dependencies.
+    Package the Lambda function.
+    Deploy the infrastructure via Terraform.
 
-bash
+5. Running Tests
 
-make deploy-lambda
-
-Terraform will provision:
-
-    An AWS Lambda function
-    SQS Queue
-    API Gateway to trigger Lambda
-
-5. Interacting with the API
-
-Use the API Gateway to trigger Lambda and fetch articles. Example using curl:
+To ensure everything is working as expected, you can run the tests using the following command:
 
 bash
 
-curl -X POST "<api_gateway_url>/articles" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
+make run-tests
 
-6. Check SQS for Messages
+6. Destroy Resources
 
-You can check your AWS SQS queue for messages containing article details.
-Example SQS Message:
-
-json
-
-{
-    "webPublicationDate": "2023-01-01T12:34:56Z",
-    "webTitle": "An Example Article",
-    "webUrl": "https://www.theguardian.com/example-article"
-}
-
-7. Running Tests
-
-Use pytest to run the unit tests:
+To clean up and remove the infrastructure created by Terraform, use:
 
 bash
 
-pytest
+make destroy-lambda
 
-8. Cleaning Up
+How It Works
 
-Destroy the infrastructure when finished:
+    Lambda Function: The Lambda function fetches articles from The Guardian API using search terms, then pushes the articles to an SQS queue.
+    API Gateway: API Gateway is used to trigger the Lambda function, passing in user-defined search terms as a POST request.
+    SQS: Articles are published in JSON format to the SQS queue for further consumption by downstream systems.
+
+Project Structure
 
 bash
 
-cd terraform
-terraform destroy
+.
+├── Makefile                # Automation commands for deployment and testing
+├── requirements.txt        # Python dependencies
+├── src/
+│   ├── main.py             # Lambda function handler
+│   ├── guardian_api.py      # API logic to fetch Guardian articles
+│   ├── message_broker.py    # SQS message sending logic
+├── terraform/
+│   ├── main.tf             # Terraform configuration for AWS resources
+│   └── variables.tf        # Terraform input variables
+├── tests/                  # Unit tests for the project
+└── lambda_package.zip      # Zipped Lambda package (generated)
 
-Common Issues
+API Example
 
-    Error: API key not set: Ensure that GUARDIAN_API_KEY is set in your environment.
-    Error: Terraform not initialized: Run terraform init inside the terraform/ directory before applying.
+You can invoke the deployed Lambda function via API Gateway. The API expects the following POST request:
 
-Contributions
+bash
 
-    Fork the repository.
-    Create a new branch (git checkout -b feature-branch).
-    Push your changes and create a pull request.
+curl -X POST https://<API_GATEWAY_URL>/articles -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
+
+License
+
+This project is open-source and available under the MIT License.
