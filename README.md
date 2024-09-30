@@ -104,3 +104,5 @@ curl -X POST https://<API_GATEWAY_URL>/articles -d '{"search_term": "machine lea
 License
 
 This project is open-source and available under the MIT License.
+
+This README ensures the user has clear step-by-step instructions on setting up, deploying, testing, and destroying the project infrastructure. It also emphasizes the use of environment variables and includes clear instructions for the API usage.
