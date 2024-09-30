@@ -1,5 +1,7 @@
+# Command to zip the Lambda function
 zip-lambda:
-    zip -r lambda_package.zip src/*
+	cd src && zip -r ../lambda_package.zip *
 
+# Command to deploy using Terraform in a subdirectory
 deploy-lambda: zip-lambda
-    terraform apply -auto-approve
+	cd terraform && terraform apply -auto-approve
