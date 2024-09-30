@@ -88,7 +88,7 @@ resource "aws_lambda_function" "guardian_lambda" {
   filename      = "../lambda_package.zip"  # Add packaging step for your function
   environment {
     variables = {
-      GUARDIAN_API_KEY = "your-api-key-here"
+      GUARDIAN_API_KEY = var.guardian_api_key
       SQS_QUEUE_NAME   = aws_sqs_queue.guardian_articles_queue.name
     }
   }
