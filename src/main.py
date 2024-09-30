@@ -1,6 +1,6 @@
 import os
-from src.guardian_api import get_guardian_articles
-from src.message_broker import send_to_sqs
+from guardian_api import get_guardian_articles
+from message_broker import send_to_sqs
 
 def lambda_handler(event, context):
     # Retrieve inputs from the event (usually passed by API Gateway)
