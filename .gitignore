@@ -16,4 +16,13 @@ venv/
 terraform.tfstate
 terraform.tfstate.backup
 
+# Lambda deployment files
 lambda_package.zip
+
+
+# Virtual environment directories
+src/venv/
+src/bin/
+src/lib/
+src/include/
+src/pyvenv.cfg
