@@ -52,6 +52,29 @@ resource "aws_iam_role_policy" "lambda_execution_policy" {
 resource "aws_sqs_queue" "guardian_articles_queue" {
   name = "guardian-articles-queue"
 }
+# SQS Queue policy
+resource "aws_sqs_queue_policy" "guardian_articles_queue_policy" {
+  queue_url = aws_sqs_queue.guardian_articles_queue.id
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "lambda.amazonaws.com"
+        },
+        "Action": "SQS:SendMessage",
+        "Resource": aws_sqs_queue.guardian_articles_queue.arn,
+        "Condition": {
+          "ArnEquals": {
+            "aws:SourceArn": aws_lambda_function.guardian_lambda.invoke_arn
+          }
+        }
+      }
+    ]
+  })
+}
 
 # Lambda function
 resource "aws_lambda_function" "guardian_lambda" {
