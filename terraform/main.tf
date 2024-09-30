@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "your-region"  # Replace with your AWS region (e.g., eu-west-2)
+  region = "eu-west-2"  # Replace with your AWS region (e.g., eu-west-2)
 }
 
 # Create IAM role for Lambda
@@ -38,7 +38,9 @@ resource "aws_iam_role_policy" "lambda_execution_policy" {
         "Effect": "Allow",
         "Action": [
           "sqs:SendMessage",
-          "sqs:GetQueueUrl"
+          "sqs:GetQueueUrl",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage"
         ],
         "Resource": aws_sqs_queue.guardian_articles_queue.arn
       }
@@ -54,10 +56,10 @@ resource "aws_sqs_queue" "guardian_articles_queue" {
 # Lambda function
 resource "aws_lambda_function" "guardian_lambda" {
   function_name = "guardian-article-lambda"
-  handler       = "src.main.lambda_handler"
-  runtime       = "python3.8"
+  handler       = "main.lambda_handler"
+  runtime       = "python3.9"
   role          = aws_iam_role.lambda_execution_role.arn
-  filename      = "lambda_package.zip"  # Add packaging step for your function
+  filename      = "../lambda_package.zip"  # Add packaging step for your function
   environment {
     variables = {
       GUARDIAN_API_KEY = "your-api-key-here"
@@ -65,6 +67,8 @@ resource "aws_lambda_function" "guardian_lambda" {
     }
   }
 }
+
+
 
 # API Gateway REST API
 resource "aws_api_gateway_rest_api" "guardian_api" {
