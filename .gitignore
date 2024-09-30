@@ -26,3 +26,10 @@ src/bin/
 src/lib/
 src/include/
 src/pyvenv.cfg
+
+# Ignore Python dependencies in src/
+src/certifi/
+src/charset_normalizer/
+src/idna/
+src/requests/
+src/urllib3/
