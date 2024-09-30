@@ -1,108 +1,122 @@
-Streaming Data Project
-Project Overview
 
-This project retrieves articles from The Guardian API based on user-defined search terms and posts them to an AWS SQS queue using AWS Lambda and API Gateway. The project is designed to be deployed on AWS infrastructure using Terraform for infrastructure management.
-Key Features
+# Streaming Data Project
 
-    Fetches up to 10 articles from The Guardian API.
-    Publishes articles in JSON format to an AWS SQS queue.
-    Fully deployable using Terraform and AWS Lambda.
-    Supports user input via API Gateway, ideal for integration into larger data platforms.
+## Project Overview
+The **Streaming Data Project** retrieves articles from The Guardian API using a search term and optionally a date. It posts the results (up to 10 articles) to an AWS SQS queue for consumption by other applications. 
 
-Requirements
+The project uses Terraform for infrastructure deployment, AWS Lambda to handle the processing, and an API Gateway to trigger the Lambda function.
 
-    Python 3.9 or above.
-    AWS Account with appropriate IAM permissions for Lambda, SQS, and API Gateway.
-    Terraform v1.0 or later installed on your local machine.
-    The Guardian API key.
+## Requirements
+Before you begin, ensure you have the following installed:
 
-Installation and Setup
-1. Clone the Repository
+- **Python** (version 3.9 or higher)
+- **AWS CLI** with properly configured credentials
+- **Terraform** (version 1.0+)
+- **Make** (for running the deployment commands)
 
-bash
+## Installation and Setup
 
+### 1. Clone the Repository
+First, clone the project repository to your local machine and navigate to the project directory:
+```bash
 git clone https://github.com/Simranjeeet-Singh/streaming-data.git
 cd streaming-data
+```
 
-2. Environment Setup
+### 2. Install Dependencies
 
-Ensure your system has pip and Python 3.9+. Install the necessary Python dependencies:
+Install the Python dependencies specified in the requirements.txt file:
 
-bash
-
+```
 pip install -r requirements.txt
+```
 
-3. Configure AWS Credentials
+### 3. Set Up AWS Credentials
 
-Ensure that your AWS credentials are configured properly. This can be done by using the AWS CLI:
+Ensure your AWS credentials are set up correctly by running:
 
-bash
-
+```
 aws configure
+```
 
-4. Set Up API Key and Deploy
+This will prompt you to enter your AWS Access Key, Secret Key, region, etc.
 
-The deployment process requires the Guardian API key. To deploy the project, you can pass the key via the CLI using the following make command:
+### 4. Provide the Guardian API Key
 
-bash
+The project requires a Guardian API key for accessing The Guardian API. You can set this API key while deploying.
 
+If you haven't already, obtain a Guardian API key from The Guardian Open Platform.
+### 5. Deploy the Project
+
+To deploy the Lambda function and related AWS infrastructure using Terraform, use the following command:
+
+```
 make deploy-lambda API_KEY=your_guardian_api_key
-
+```
+The api key will become the environment variable for Lambda function which can also be changed from the console directly after deployment.
 This will:
 
-    Install dependencies.
-    Package the Lambda function.
-    Deploy the infrastructure via Terraform.
+    Package the Lambda function and its dependencies.
+    Deploy the Lambda function, SQS queue, and API Gateway using Terraform.
+    Set up the Guardian API key in AWS Lambda.
 
-5. Running Tests
+### 6. Test Lambda Invocation
 
-To ensure everything is working as expected, you can run the tests using the following command:
+You can test your deployed Lambda function using AWS API Gateway:
 
-bash
+```
+curl -X POST <api_gateway_url> -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
+```
+Replace <api_gateway_url> with the actual URL generated from the deployment.
+### 7. Run Tests
 
+To ensure everything works as expected, you can run the tests using the following command:
+
+```
 make run-tests
+```
+### 8. Destroy Resources
 
-6. Destroy Resources
+To clean up and destroy all AWS resources created by the deployment, use the following command:
 
-To clean up and remove the infrastructure created by Terraform, use:
-
-bash
-
+```
 make destroy-lambda
+```
+### Project Structure
 
-How It Works
+```
 
-    Lambda Function: The Lambda function fetches articles from The Guardian API using search terms, then pushes the articles to an SQS queue.
-    API Gateway: API Gateway is used to trigger the Lambda function, passing in user-defined search terms as a POST request.
-    SQS: Articles are published in JSON format to the SQS queue for further consumption by downstream systems.
+streaming-data/
+│
+├── src/                     # Contains the main Python files and modules
+│   ├── main.py              # Entry point for the Lambda function
+│   ├── message_broker.py    # SQS handling functionality
+│   └── guardian_api.py      # API interaction with The Guardian
+│
+├── tests/                   # Unit tests
+│   ├── test_main.py
+│   ├── test_message_broker.py
+│   └── test_guardian_api.py
+│
+├── terraform/               # Terraform configuration files
+│   ├── main.tf              # Defines AWS resources (Lambda, SQS, API Gateway)
+│   ├── variables.tf         # Defines input variables like API key
+│   └── outputs.tf           # Defines output for resources like SQS URL
+│
+├── Makefile                 # Automation for build, deploy, test, and clean
+├── requirements.txt         # Python dependencies
+├── module-requirements.txt  # Additional Project Modules
+└── README.md                # Project documentation (this file)
+```
+### Variables
 
-Project Structure
+API_KEY: The Guardian API key used to fetch articles.
 
-bash
+AWS_REGION: AWS region for deploying the infrastructure (default: eu-west-2).
 
-.
-├── Makefile                # Automation commands for deployment and testing
-├── requirements.txt        # Python dependencies
-├── src/
-│   ├── main.py             # Lambda function handler
-│   ├── guardian_api.py      # API logic to fetch Guardian articles
-│   ├── message_broker.py    # SQS message sending logic
-├── terraform/
-│   ├── main.tf             # Terraform configuration for AWS resources
-│   └── variables.tf        # Terraform input variables
-├── tests/                  # Unit tests for the project
-└── lambda_package.zip      # Zipped Lambda package (generated)
+### Notes
 
-API Example
+Guardian API Rate Limits: Be mindful of the Guardian API rate limits, especially when testing.
 
-You can invoke the deployed Lambda function via API Gateway. The API expects the following POST request:
+Security: Do not hardcode sensitive information like API keys or AWS credentials. Always set them via environment variables or Terraform inputs.
 
-bash
-
-curl -X POST https://<API_GATEWAY_URL>/articles -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
-
-License
-
-This project is open-source and available under the MIT License.
-
-This README ensures the user has clear step-by-step instructions on setting up, deploying, testing, and destroying the project infrastructure. It also emphasizes the use of environment variables and includes clear instructions for the API usage.
