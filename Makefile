@@ -8,7 +8,7 @@ zip-lambda:
 
 # Command to run tests
 run-tests:
-	pytest --maxfail=1 --disable-warnings -v tests/
+	PYTHONPATH=src pytest --maxfail=1 --disable-warnings -v tests/
 
 # Command to deploy using Terraform
 deploy-lambda: zip-lambda
