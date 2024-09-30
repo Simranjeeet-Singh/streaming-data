@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from src.guardian_api import get_guardian_articles
+from guardian_api import get_guardian_articles
 
 class TestGuardianAPI(unittest.TestCase):
 
-    @patch('src.guardian_api.requests.get')  # Patch 'requests.get'
+    @patch('guardian_api.requests.get')  # Patch 'requests.get'
     def test_get_guardian_articles_success(self, mock_get):
         # Mock the response object
         mock_response = MagicMock()
@@ -35,7 +35,7 @@ class TestGuardianAPI(unittest.TestCase):
         self.assertEqual(articles[0]['webTitle'], "Sample Article")
         self.assertEqual(articles[0]['webUrl'], "https://www.theguardian.com/sample-article")
     
-    @patch('src.guardian_api.requests.get')
+    @patch('guardian_api.requests.get')
     def test_get_guardian_articles_invalid_key(self, mock_get):
         # Mock a failed API response due to invalid API key
         mock_response = MagicMock()
@@ -55,7 +55,7 @@ class TestGuardianAPI(unittest.TestCase):
         self.assertTrue("Guardian API request failed" in str(context.exception))
    
     
-    @patch('src.guardian_api.requests.get')
+    @patch('guardian_api.requests.get')
     def test_get_guardian_articles_no_results(self, mock_get):
         # Mock a successful API response with no results
         mock_response = MagicMock()

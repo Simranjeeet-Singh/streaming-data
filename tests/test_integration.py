@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import os
-from src.main import lambda_handler
+from main import lambda_handler
 
 class TestIntegration(unittest.TestCase):
 
