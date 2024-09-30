@@ -1,2 +1,5 @@
-requests    # For making HTTP requests to the Guardian API
-boto3       # AWS SDK for Python to interact with SQS
+requests==2.32.3
+urllib3==2.2.3
+idna==3.10
+certifi==2024.8.30
+charset_normalizer==3.3.2
