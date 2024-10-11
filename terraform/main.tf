@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "eu-west-2"  # Replace with your AWS region (e.g., eu-west-2)
+  region = var.region
 }
 
 # Create IAM role for Lambda
@@ -52,6 +52,7 @@ resource "aws_iam_role_policy" "lambda_execution_policy" {
 resource "aws_sqs_queue" "guardian_articles_queue" {
   name = "guardian-articles-queue"
 }
+
 # SQS Queue policy
 resource "aws_sqs_queue_policy" "guardian_articles_queue_policy" {
   queue_url = aws_sqs_queue.guardian_articles_queue.id
@@ -94,8 +95,6 @@ resource "aws_lambda_function" "guardian_lambda" {
   }
 }
 
-
-
 # API Gateway REST API
 resource "aws_api_gateway_rest_api" "guardian_api" {
   name = "guardian-api"
@@ -126,6 +125,13 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   uri                     = aws_lambda_function.guardian_lambda.invoke_arn
 }
 
+# API Gateway deployment
+resource "aws_api_gateway_deployment" "deployment" {
+  rest_api_id = aws_api_gateway_rest_api.guardian_api.id
+  stage_name  = "prod"  # Name this stage appropriately for deployment
+  depends_on  = [aws_api_gateway_integration.lambda_integration]
+}
+
 # Grant API Gateway permission to invoke Lambda
 resource "aws_lambda_permission" "api_gateway_permission" {
   statement_id  = "AllowExecutionFromAPIGateway"
@@ -135,9 +141,10 @@ resource "aws_lambda_permission" "api_gateway_permission" {
   source_arn    = "${aws_api_gateway_rest_api.guardian_api.execution_arn}/*/*"
 }
 
-# Output SQS Queue URL
-output "sqs_queue_url" {
-  value = aws_sqs_queue.guardian_articles_queue.url
+# Output API Gateway URL after deploying
+output "api_gateway_url" {
+  value = aws_api_gateway_deployment.deployment.invoke_url
+  description = "URL for accessing the deployed API Gateway endpoint."
 }
 
 
