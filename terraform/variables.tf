@@ -1,5 +1,6 @@
 variable "region" {
   default = "eu-west-2"
+  description = "AWS region for deploying resources"
 }
 
 variable "guardian_api_key" {
