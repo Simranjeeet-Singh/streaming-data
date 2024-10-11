@@ -1,11 +1,17 @@
 import os
+import json
 from guardian_api import get_guardian_articles
 from message_broker import send_to_sqs
 
 def lambda_handler(event, context):
     # Retrieve inputs from the event (usually passed by API Gateway)
-    search_term = event.get('search_term', 'default_term')
-    date_from = event.get('date_from', None)
+    if event.get("queryStringParameters"):
+        search_term = event.get("queryStringParameters", {}).get("search_term")
+        date_from = event.get("queryStringParameters", {}).get("date_from")
+    else:
+        body = json.loads(event.get("body", "{}"))
+        search_term = body.get("search_term")
+        date_from = body.get("date_from")
 
     # Use environment variables for sensitive info like API key and SQS queue name
     api_key = os.getenv('GUARDIAN_API_KEY')
@@ -22,3 +28,4 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": f"Successfully sent {len(articles)} articles to SQS."
     }
+
