@@ -1,111 +1,122 @@
-Streaming Data Project
-Overview
 
-This project fetches articles from The Guardian API and publishes them to AWS SQS. It uses AWS Lambda and API Gateway for serverless architecture and Terraform for infrastructure deployment.
-Features
+# Streaming Data Project
 
-    Fetches up to 10 recent articles from The Guardian API using a search term.
-    Publishes article data to an AWS SQS queue.
-    Automates infrastructure setup using Terraform and Makefile.
+## Project Overview
+The **Streaming Data Project** retrieves articles from The Guardian API using a search term and optionally a date. It posts the results (up to 10 articles) to an AWS SQS queue for consumption by other applications. 
 
-Prerequisites
+The project uses Terraform for infrastructure deployment, AWS Lambda to handle the processing, and an API Gateway to trigger the Lambda function.
 
-    Python 3.x
-    AWS Account and configured AWS CLI
-    Terraform installed
-    Guardian API key (free-tier available)
+## Requirements
+Before you begin, ensure you have the following installed:
 
-Setup Instructions
-1. Clone the Repository
+- **Python** (version 3.9 or higher)
+- **AWS CLI** with properly configured credentials
+- **Terraform** (version 1.0+)
+- **Make** (for running the deployment commands)
 
-bash
+## Installation and Setup
 
-git clone <your-forked-repo-url>
+### 1. Clone the Repository
+First, clone the project repository to your local machine and navigate to the project directory:
+```bash
+git clone https://github.com/Simranjeeet-Singh/streaming-data.git
 cd streaming-data
+```
 
-2. Install Python Dependencies
+### 2. Install Dependencies
 
-Create a virtual environment and install dependencies:
+Install the Python dependencies specified in the requirements.txt file:
 
-bash
-
-python3 -m venv venv
-source venv/bin/activate
+```
 pip install -r requirements.txt
+```
 
-3. Configure AWS and Guardian API
+### 3. Set Up AWS Credentials
 
-Ensure AWS CLI is configured:
+Ensure your AWS credentials are set up correctly by running:
 
-bash
-
+```
 aws configure
+```
 
-Set the Guardian API key in the environment:
+This will prompt you to enter your AWS Access Key, Secret Key, region, etc.
 
-bash
+### 4. Provide the Guardian API Key
 
-export GUARDIAN_API_KEY=<your-guardian-api-key>
+The project requires a Guardian API key for accessing The Guardian API. You can set this API key while deploying.
 
-4. Deploy with Terraform
+If you haven't already, obtain a Guardian API key from The Guardian Open Platform.
+### 5. Deploy the Project
 
-Use the provided Makefile to zip the Lambda package and apply Terraform:
+To deploy the Lambda function and related AWS infrastructure using Terraform, use the following command:
 
-bash
+```
+make deploy-lambda API_KEY=your_guardian_api_key
+```
+The api key will become the environment variable for Lambda function which can also be changed from the console directly after deployment.
+This will:
 
-make deploy-lambda
+    Package the Lambda function and its dependencies.
+    Deploy the Lambda function, SQS queue, and API Gateway using Terraform.
+    Set up the Guardian API key in AWS Lambda.
 
-Terraform will provision:
+### 6. Test Lambda Invocation
 
-    An AWS Lambda function
-    SQS Queue
-    API Gateway to trigger Lambda
+You can test your deployed Lambda function using AWS API Gateway:
 
-5. Interacting with the API
+```
+curl -X POST <api_gateway_url> -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
+```
+Replace <api_gateway_url> with the actual URL generated from the deployment.
+### 7. Run Tests
 
-Use the API Gateway to trigger Lambda and fetch articles. Example using curl:
+To ensure everything works as expected, you can run the tests using the following command:
 
-bash
+```
+make run-tests
+```
+### 8. Destroy Resources
 
-curl -X POST "<api_gateway_url>/articles" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
+To clean up and destroy all AWS resources created by the deployment, use the following command:
 
-6. Check SQS for Messages
+```
+make destroy-lambda
+```
+### Project Structure
 
-You can check your AWS SQS queue for messages containing article details.
-Example SQS Message:
+```
 
-json
+streaming-data/
+│
+├── src/                     # Contains the main Python files and modules
+│   ├── main.py              # Entry point for the Lambda function
+│   ├── message_broker.py    # SQS handling functionality
+│   └── guardian_api.py      # API interaction with The Guardian
+│
+├── tests/                   # Unit tests
+│   ├── test_main.py
+│   ├── test_message_broker.py
+│   └── test_guardian_api.py
+│
+├── terraform/               # Terraform configuration files
+│   ├── main.tf              # Defines AWS resources (Lambda, SQS, API Gateway)
+│   ├── variables.tf         # Defines input variables like API key
+│   └── outputs.tf           # Defines output for resources like SQS URL
+│
+├── Makefile                 # Automation for build, deploy, test, and clean
+├── requirements.txt         # Python dependencies
+├── module-requirements.txt  # Additional Project Modules
+└── README.md                # Project documentation (this file)
+```
+### Variables
 
-{
-    "webPublicationDate": "2023-01-01T12:34:56Z",
-    "webTitle": "An Example Article",
-    "webUrl": "https://www.theguardian.com/example-article"
-}
+API_KEY: The Guardian API key used to fetch articles.
 
-7. Running Tests
+AWS_REGION: AWS region for deploying the infrastructure (default: eu-west-2).
 
-Use pytest to run the unit tests:
+### Notes
 
-bash
+Guardian API Rate Limits: Be mindful of the Guardian API rate limits, especially when testing.
 
-pytest
+Security: Do not hardcode sensitive information like API keys or AWS credentials. Always set them via environment variables or Terraform inputs.
 
-8. Cleaning Up
-
-Destroy the infrastructure when finished:
-
-bash
-
-cd terraform
-terraform destroy
-
-Common Issues
-
-    Error: API key not set: Ensure that GUARDIAN_API_KEY is set in your environment.
-    Error: Terraform not initialized: Run terraform init inside the terraform/ directory before applying.
-
-Contributions
-
-    Fork the repository.
-    Create a new branch (git checkout -b feature-branch).
-    Push your changes and create a pull request.
