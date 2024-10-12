@@ -1,0 +1,7 @@
+pytest==7.4.4     # Running the test for the lambda functions
+requests==2.32.3  # For making HTTP requests to the Guardian API
+boto3==1.28.0     # AWS SDK for Python to interact with SQS
+
+
+
+
