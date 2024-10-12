@@ -1,3 +1,0 @@
-requests    # For making HTTP requests to the Guardian API
-boto3       # AWS SDK for Python to interact with SQS
-terraform   #AWS infrastructure deployment

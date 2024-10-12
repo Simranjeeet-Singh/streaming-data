@@ -1,9 +1,17 @@
 # Set variables for deployment
 export TF_VAR_guardian_api_key := $(guardian_api_key)
 
+# Command to create a virtual environment for Python
+create-venv:
+	python3 -m venv venv
+
+# Command to activate virtual environment and install dependencies for testing
+install-dependencies: create-venv
+	. venv/bin/activate && pip install -r requirements-test.txt
+
 # Command to zip the Lambda function and its dependencies
 zip-lambda:
-	pip install -r requirements.txt -t ./src
+	pip install -r requirements-lambda.txt -t ./src
 	cd src && zip -r ../lambda_package.zip *
 
 # Command to run tests
