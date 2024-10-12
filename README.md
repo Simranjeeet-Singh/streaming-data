@@ -1,34 +1,43 @@
-
 # Streaming Data Project
 
-## Project Overview
-The **Streaming Data Project** retrieves articles from The Guardian API using a search term and optionally a date. It posts the results (up to 10 articles) to an AWS SQS queue for consumption by other applications. 
+This project automates the process of pulling articles from The Guardian API based on search terms and sending those articles to an AWS SQS queue. It uses AWS Lambda, API Gateway, and SQS, with infrastructure deployed using Terraform.
 
-The project uses Terraform for infrastructure deployment, AWS Lambda to handle the processing, and an API Gateway to trigger the Lambda function.
+## Table of Contents
+1. [Features](#features)
+2. [Requirements](#requirements)
+3. [Setup Instructions](#setup-instructions)
+4. [Testing](#testing)
+5. [Deployment](#deployment)
+6. [Usage](#usage)
+7. [Cleaning Up](#cleaning-up)
+
+## Features
+- Fetches news articles from The Guardian API.
+- Sends the articles to AWS SQS using AWS Lambda.
+- Easy deployment using Makefile and Terraform.
 
 ## Requirements
-Before you begin, ensure you have the following installed:
+- **Python**: 3.9 or above.
+- **AWS CLI v2**: To configure AWS credentials locally.
+- **Terraform**: v1.7.5 or higher.
+- **Python Dependencies**:
+  - **Lambda Requirements** (`requirements-lambda.txt`): `requests`, `boto3`.
+  - **Testing Requirements** (`requirements-test.txt`): `requests`, `boto3`, `pytest`.
 
-- **Python** (version 3.9 or higher)
-- **AWS CLI** with properly configured credentials
-- **Terraform** (version 1.0+)
-- **Make** (for running the deployment commands)
-
-## Installation and Setup
+## Setup Instructions
 
 ### 1. Clone the Repository
-First, clone the project repository to your local machine and navigate to the project directory:
 ```bash
 git clone https://github.com/Simranjeeet-Singh/streaming-data.git
 cd streaming-data
 ```
 
-### 2. Install Dependencies
+### 2. Install Testing Dependencies
 
-Install the Python dependencies specified in the requirements.txt file:
+Install all dependencies needed for running tests:
 
 ```
-pip install -r requirements.txt
+make install-dependencies
 ```
 
 ### 3. Set Up AWS Credentials
@@ -46,6 +55,14 @@ This will prompt you to enter your AWS Access Key, Secret Key, region, etc.
 The project requires a Guardian API key for accessing The Guardian API. You can set this API key while deploying.
 
 If you haven't already, obtain a Guardian API key from The Guardian Open Platform.
+
+### 5. Run Tests
+
+To ensure everything works as expected, you can run the tests using the following command:
+
+```
+make run-tests
+```
 ### 5. Deploy the Project
 
 To deploy the Lambda function and related AWS infrastructure using Terraform, use the following command:
@@ -60,28 +77,32 @@ This will:
     Deploy the Lambda function, SQS queue, and API Gateway using Terraform.
     Set up the Guardian API key in AWS Lambda.
 
-### 6. Test Lambda Invocation
+### 6. API Gateway Endpoint URL
 
-You can test your deployed Lambda function using AWS API Gateway:
+After deployment, the Terraform script will output the API Gateway URL that can be used to invoke the Lambda function.
 
 ```
-curl -X POST <api_gateway_url> -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
+curl -X POST "https://<your-api-gateway-url>/articles" -H "Content-Type: application/json" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
 ```
 Replace <api_gateway_url> with the actual URL generated from the deployment.
-### 7. Run Tests
 
-To ensure everything works as expected, you can run the tests using the following command:
 
-```
-make run-tests
-```
-### 8. Destroy Resources
+### 7. Destroy Resources
 
 To clean up and destroy all AWS resources created by the deployment, use the following command:
 
 ```
 make destroy-lambda
 ```
+### Makefile Overview
+
+```
+zip-lambda: Creates a Lambda deployment package.
+run-tests: Executes unit tests.
+deploy-lambda: Deploys all AWS resources using Terraform.
+destroy-lambda: Tears down all infrastructure.
+```
+
 ### Project Structure
 
 ```
@@ -101,11 +122,10 @@ streaming-data/
 ├── terraform/               # Terraform configuration files
 │   ├── main.tf              # Defines AWS resources (Lambda, SQS, API Gateway)
 │   ├── variables.tf         # Defines input variables like API key
-│   └── outputs.tf           # Defines output for resources like SQS URL
 │
 ├── Makefile                 # Automation for build, deploy, test, and clean
-├── requirements.txt         # Python dependencies
-├── module-requirements.txt  # Additional Project Modules
+├── requirements-test.txt    # Python dependencies
+├── requirements-lambda.txt  # Python dependencies for Lambda 
 └── README.md                # Project documentation (this file)
 ```
 ### Variables
