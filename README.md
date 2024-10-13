@@ -32,15 +32,38 @@ git clone https://github.com/Simranjeeet-Singh/streaming-data.git
 cd streaming-data
 ```
 
-### 2. Install Testing Dependencies
+### 2. Setting up local environment
 
-Install all dependencies needed for running tests:
+The venv is created using the following make command:
+
+```
+make create-venv
+```
+
+To activate the local environment run: 
+
+```
+. venv/bin/activate
+```
+
+Install all dependencies into the venv needed for testing locally:
 
 ```
 make install-dependencies
 ```
 
-### 3. Set Up AWS Credentials
+### 2. Local Machine Testing
+
+To ensure everything works as expected, you can run the local testing before deployment using the following command:
+
+```
+make run-tests
+```
+
+## Deployment
+
+
+### 1. Set Up AWS Credentials
 
 Ensure your AWS credentials are set up correctly by running:
 
@@ -50,20 +73,14 @@ aws configure
 
 This will prompt you to enter your AWS Access Key, Secret Key, region, etc.
 
-### 4. Provide the Guardian API Key
+### 2. Provide the Guardian API Key
 
 The project requires a Guardian API key for accessing The Guardian API. You can set this API key while deploying.
 
 If you haven't already, obtain a Guardian API key from The Guardian Open Platform.
 
-### 5. Run Tests
 
-To ensure everything works as expected, you can run the tests using the following command:
-
-```
-make run-tests
-```
-### 5. Deploy the Project
+### 3. Deploy the Project
 
 To deploy the Lambda function and related AWS infrastructure using Terraform, use the following command:
 
@@ -74,20 +91,23 @@ The api key will become the environment variable for Lambda function which can a
 This will:
 
     Package the Lambda function and its dependencies.
-    Deploy the Lambda function, SQS queue, and API Gateway using Terraform.
+    Deploy the Lambda function, SQS queue, and API Gateway and stage it using Terraform.
     Set up the Guardian API key in AWS Lambda.
 
-### 6. API Gateway Endpoint URL
+### 4. API Gateway Endpoint URL
 
 After deployment, the Terraform script will output the API Gateway URL that can be used to invoke the Lambda function.
 
 ```
-curl -X POST "https://<your-api-gateway-url>/articles" -H "Content-Type: application/json" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
+curl -X POST "<your-api-gateway-url>/articles" -H "Content-Type: application/json" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
 ```
 Replace <api_gateway_url> with the actual URL generated from the deployment.
 
+### Usage
 
-### 7. Destroy Resources
+After the succesful deployment of the Lmabda function, the lambda can be invoke in two ways through the AWS Console and CLI via API Gateway
+
+### Cleaning up
 
 To clean up and destroy all AWS resources created by the deployment, use the following command:
 
@@ -124,7 +144,7 @@ streaming-data/
 │   ├── variables.tf         # Defines input variables like API key
 │
 ├── Makefile                 # Automation for build, deploy, test, and clean
-├── requirements-test.txt    # Python dependencies
+├── requirements-test.txt    # Python dependencies for local testing
 ├── requirements-lambda.txt  # Python dependencies for Lambda 
 └── README.md                # Project documentation (this file)
 ```
