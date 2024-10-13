@@ -4,6 +4,7 @@ variable "region" {
 }
 
 variable "guardian_api_key" {
+  default = "your-guardian-api-key"
   description = "API key for The Guardian API"
   type        = string
 }
