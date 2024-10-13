@@ -1,6 +1,8 @@
 # Streaming Data Project
 
-This project automates the process of pulling articles from The Guardian API based on search terms and sending those articles to an AWS SQS queue. It uses AWS Lambda, API Gateway, and SQS, with infrastructure deployed using Terraform.
+## Overview 
+
+The app automates the process of pulling articles from The Guardian API based on search term and sending those articles to an AWS SQS queue.It uses AWS Lambda, API Gateway, and SQS, with infrastructure deployed using Terraform. The app takes the input of search term and date from which to start looking, and then locates the articles using The Guardian API and then takes the Web Title,Publication Date and the article Web Url and posts it to AWS SQS queue.
 
 ## Table of Contents
 1. [Features](#features)
@@ -17,9 +19,13 @@ This project automates the process of pulling articles from The Guardian API bas
 - Easy deployment using Makefile and Terraform.
 
 ## Requirements
+The local machine must have the following installed so to test project locally and deployment on AWS from the local OS.
+
 - **Python**: 3.9 or above.
 - **AWS CLI v2**: To configure AWS credentials locally.
 - **Terraform**: v1.7.5 or higher.
+
+The Python packages which are required are divided into two parts. The details of installing them with Make File commands which uses the commands in make file can be found in the Setup Instructions.
 - **Python Dependencies**:
   - **Lambda Requirements** (`requirements-lambda.txt`): `requests`, `boto3`.
   - **Testing Requirements** (`requirements-test.txt`): `requests`, `boto3`, `pytest`.
