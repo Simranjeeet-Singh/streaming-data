@@ -21,7 +21,7 @@ run-tests:
 # Command to deploy using Terraform
 deploy-lambda: zip-lambda
 	cd terraform && terraform init
-	cd terraform && terraform apply -auto-approve
+	cd terraform && terraform apply -var "guardian_api_key=$(guardian_api_key)" -auto-approve
 
 # Command to destroy resources
 destroy-lambda:
