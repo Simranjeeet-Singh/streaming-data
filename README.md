@@ -91,7 +91,7 @@ If you haven't already, obtain a Guardian API key from The Guardian Open Platfor
 To deploy the Lambda function and related AWS infrastructure using Terraform, use the following command:
 
 ```
-make deploy-lambda API_KEY=your_guardian_api_key
+make deploy-lambda guardian_api_key=your-guardian-api-key
 ```
 The api key will become the environment variable for Lambda function which can also be changed from the console directly after deployment.
 This will:
