@@ -58,7 +58,7 @@ Install all dependencies into the venv needed for testing locally:
 make install-dependencies
 ```
 
-### 2. Local Machine Testing
+## Testing
 
 To ensure everything works as expected, you can run the local testing before deployment using the following command:
 
@@ -93,34 +93,46 @@ To deploy the Lambda function and related AWS infrastructure using Terraform, us
 ```
 make deploy-lambda guardian_api_key=your-guardian-api-key
 ```
-The api key will become the environment variable for Lambda function which can also be changed from the console directly after deployment.
+The api key will become the environment variable for Lambda function.
 This will:
 
     Package the Lambda function and its dependencies.
     Deploy the Lambda function, SQS queue, and API Gateway and stage it using Terraform.
     Set up the Guardian API key in AWS Lambda.
 
-### 4. API Gateway Endpoint URL
+If the guardian api key is not passed through with terraform deployment then it can added/edited from the AWS management console in lambda under configuration section after deployment.
+
+### 4. API Gateway-Invoking from CLI
 
 After deployment, the Terraform script will output the API Gateway URL that can be used to invoke the Lambda function.
 
 ```
-curl -X POST "<your-api-gateway-url>/articles" -H "Content-Type: application/json" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
+curl -X POST "<your_api_gateway_url>/articles" -H "Content-Type: application/json" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
 ```
-Replace <api_gateway_url> with the actual URL generated from the deployment.
+Replace <your_api_gateway_url> with the API gateway URL that will be displayed as output after terraform deployment. The api gateway url can also be obtained from the AWS management console from the api gateway deployed through the project.
 
-### Usage
+### 5. Testing on AWS after cloud deployment
 
-After the succesful deployment of the Lmabda function, the lambda can be invoke in two ways through the AWS Console and CLI via API Gateway
+Lambda can be tested from the aws management console by invoking with the json paramters as :
+```
+{
+  "search_term": "machine learning",
+  "date_from": "2023-01-01"
+}
+```
 
-### Cleaning up
+## Usage
+
+After the succesful deployment of the Lambda function, the lambda can be invoke in two ways through the AWS Console and CLI via API Gateway.
+
+## Cleaning up
 
 To clean up and destroy all AWS resources created by the deployment, use the following command:
 
 ```
 make destroy-lambda
 ```
-### Makefile Overview
+## Makefile Overview
 
 ```
 zip-lambda: Creates a Lambda deployment package.
@@ -129,7 +141,7 @@ deploy-lambda: Deploys all AWS resources using Terraform.
 destroy-lambda: Tears down all infrastructure.
 ```
 
-### Project Structure
+## Project Structure
 
 ```
 
