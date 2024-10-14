@@ -2,7 +2,7 @@
 
 ## Overview 
 
-The app automates the process of pulling articles from The Guardian API based on search term and sending those articles to an AWS SQS queue.It uses AWS Lambda, API Gateway, and SQS, with infrastructure deployed using Terraform. The app takes the input of search term and date from which to start looking, and then locates the articles using The Guardian API and then takes the Web Title,Publication Date and the article Web Url and posts it to AWS SQS queue.
+The app automates the process of pulling articles from The Guardian API based on search term and sending those articles to an AWS SQS queue.It uses AWS Lambda, API Gateway, and SQS, with infrastructure deployed using Terraform. The app takes the input of search term and starting date, and then locates the articles using The Guardian API and then sends the Web Title,Publication Date and the article Web Url to an AWS SQS queue.
 
 ## Table of Contents
 1. [Features](#features)
@@ -12,6 +12,9 @@ The app automates the process of pulling articles from The Guardian API based on
 5. [Deployment](#deployment)
 6. [Usage](#usage)
 7. [Cleaning Up](#cleaning-up)
+8. [Makefile Overview](#makefile-overview)
+9. [Project Structure](#project-structure)
+10. [Notes](#notes)
 
 ## Features
 - Fetches news articles from The Guardian API.
@@ -19,6 +22,14 @@ The app automates the process of pulling articles from The Guardian API based on
 - Easy deployment using Makefile and Terraform.
 
 ## Requirements
+
+### AWS Acoount
+You will need an **AWS Account** to set up the infrastructure. If you don't already have an account, you can create one here: [AWS Account Sign-Up](https://aws.amazon.com/free).
+
+### The Guardian API Key
+To fetch news articles, you need a **Guardian API Key**. Register for a developer API key at [The Guardian Open Platform](https://open-platform.theguardian.com/access/).
+
+### Software Requirements
 The local machine must have the following installed so to test project locally and deployment on AWS from the local OS.
 
 - **Python**: 3.9 or above.
@@ -40,19 +51,19 @@ cd streaming-data
 
 ### 2. Setting up local environment
 
-The venv is created using the following make command:
+Create the virtual environment using the following Makefile command:
 
 ```
 make create-venv
 ```
 
-To activate the local environment run: 
+To activate the virtual environment, run:
 
 ```
 . venv/bin/activate
 ```
 
-Install all dependencies into the venv needed for testing locally:
+Install all dependencies into the virtual environment needed for testing locally:
 
 ```
 make install-dependencies
@@ -65,6 +76,7 @@ To ensure everything works as expected, you can run the local testing before dep
 ```
 make run-tests
 ```
+Ensure that you have activated the virtual environment (. venv/bin/activate) before running the tests.
 
 ## Deployment
 
@@ -79,14 +91,8 @@ aws configure
 
 This will prompt you to enter your AWS Access Key, Secret Key, region, etc.
 
-### 2. Provide the Guardian API Key
 
-The project requires a Guardian API key for accessing The Guardian API. You can set this API key while deploying.
-
-If you haven't already, obtain a Guardian API key from The Guardian Open Platform.
-
-
-### 3. Deploy the Project
+### 2. Deploy the Project
 
 To deploy the Lambda function and related AWS infrastructure using Terraform, use the following command:
 
@@ -94,36 +100,34 @@ To deploy the Lambda function and related AWS infrastructure using Terraform, us
 make deploy-lambda guardian_api_key=your-guardian-api-key
 ```
 The api key will become the environment variable for Lambda function.
-This will:
+This command will:
 
-    Package the Lambda function and its dependencies.
-    Deploy the Lambda function, SQS queue, and API Gateway and stage it using Terraform.
-    Set up the Guardian API key in AWS Lambda.
+- Package the Lambda function and its dependencies.
+- Deploy the Lambda function, SQS queue, and API Gateway and stage it using Terraform.
+- Set up the Guardian API key in AWS Lambda.
 
 If the guardian api key is not passed through with terraform deployment then it can added/edited from the AWS management console in lambda under configuration section after deployment.
 
-### 4. API Gateway-Invoking from CLI
+### 3. API Gateway-Invoking from CLI
 
-After deployment, the Terraform script will output the API Gateway URL that can be used to invoke the Lambda function.
+After deployment, the Terraform script will output the API Gateway URL that can be used to invoke the Lambda function using cURL
+The api gateway URL will be like : https://<api-id>.execute-api.<aws-region>.amazonaws.com/prod
 
 ```
 curl -X POST "<your_api_gateway_url>/articles" -H "Content-Type: application/json" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
 ```
-Replace <your_api_gateway_url> with the API gateway URL that will be displayed as output after terraform deployment. The api gateway url can also be obtained from the AWS management console from the api gateway deployed through the project.
+Replace <your_api_gateway_url> with the API gateway URL that will be displayed as output after terraform deployment. The api gateway url can also be obtained from the AWS management console from the api gateway deployed.
 
-### 5. Testing on AWS after cloud deployment
+### 4. Testing on AWS after cloud deployment
 
-Lambda can be tested from the aws management console by invoking with the json paramters as :
-```
-{
-  "search_term": "machine learning",
-  "date_from": "2023-01-01"
-}
-```
+Lambda can be tested from the aws management console by invoking with the json event. The guardian api key has to be provided as enviornment variable before testing with json event.
 
 ## Usage
 
-After the succesful deployment of the Lambda function, the lambda can be invoke in two ways through the AWS Console and CLI via API Gateway.
+After successfully deploying the Lambda function, it can be invoked in two ways:
+
+- 1.**AWS Console**: Test the Lambda directly via the "Test" button.
+- 2.**API Gateway via CL**: Use the API Gateway URL output to send a POST request.
 
 ## Cleaning up
 
@@ -134,12 +138,12 @@ make destroy-lambda
 ```
 ## Makefile Overview
 
-```
-zip-lambda: Creates a Lambda deployment package.
-run-tests: Executes unit tests.
-deploy-lambda: Deploys all AWS resources using Terraform.
-destroy-lambda: Tears down all infrastructure.
-```
+- **create-venv**: Creates a virtual environment for isolated Python dependencies.
+- **install-dependencies**: Installs all dependencies required for local testing.
+- **zip-lambda**: Packages Lambda deployment and its dependencies.
+- **run-tests**: Installs all dependencies required for local testing.
+- **deploy-lambda**: Deploys all AWS resources using Terraform.
+- **destroy-lambda**: Tears down all infrastructure.
 
 ## Project Structure
 
@@ -168,13 +172,13 @@ streaming-data/
 ```
 ### Variables
 
-API_KEY: The Guardian API key used to fetch articles.
+- guardian_api_key: The Guardian API key used to fetch articles.
 
-AWS_REGION: AWS region for deploying the infrastructure (default: eu-west-2).
+- aws_region: AWS region for deploying the infrastructure (default: eu-west-2).
 
 ### Notes
 
 Guardian API Rate Limits: Be mindful of the Guardian API rate limits, especially when testing.
 
-Security: Do not hardcode sensitive information like API keys or AWS credentials. Always set them via environment variables or Terraform inputs.
+Security: Do not hardcode sensitive information like API keys or AWS credentials. Use environment variables or Terraform inputs instead.
 
