@@ -110,13 +110,18 @@ If the guardian api key is not passed through with terraform deployment then it 
 
 ### 3. API Gateway-Invoking from CLI
 
-After deployment, the Terraform script will output the API Gateway URL that can be used to invoke the Lambda function using cURL
-The api gateway URL will be like : https://<api-id>.execute-api.<aws-region>.amazonaws.com/prod
+After deployment, the Terraform script will output the API Gateway URL that can be used to invoke the Lambda function using curl command stated in this section.
+The api gateway URL will be like : 
+
+```https://<api-id>.execute-api.<aws-region>.amazonaws.com/prod
+```
+The <api-id> can also be obtained from the AWS management console, and 'prod' is the stage name set up in the project.
+The following command invokes lambda function:
 
 ```
 curl -X POST "<your_api_gateway_url>/articles" -H "Content-Type: application/json" -d '{"search_term": "machine learning", "date_from": "2023-01-01"}'
 ```
-Replace <your_api_gateway_url> with the API gateway URL that will be displayed as output after terraform deployment. The api gateway url can also be obtained from the AWS management console from the api gateway deployed.
+Replace <your_api_gateway_url> with the API gateway URL that will be displayed as output after terraform deployment. The value for "search_term" and "date_from" is user input.
 
 ### 4. Testing on AWS after cloud deployment
 
@@ -126,8 +131,8 @@ Lambda can be tested from the aws management console by invoking with the json e
 
 After successfully deploying the Lambda function, it can be invoked in two ways:
 
-- 1.**AWS Console**: Test the Lambda directly via the "Test" button.
-- 2.**API Gateway via CL**: Use the API Gateway URL output to send a POST request.
+- **AWS Console**: Test the Lambda directly via the "Test" button.
+- **API Gateway via CL**: Use the API Gateway URL output to send a POST request.
 
 ## Cleaning up
 
@@ -141,7 +146,7 @@ make destroy-lambda
 - **create-venv**: Creates a virtual environment for isolated Python dependencies.
 - **install-dependencies**: Installs all dependencies required for local testing.
 - **zip-lambda**: Packages Lambda deployment and its dependencies.
-- **run-tests**: Installs all dependencies required for local testing.
+- **run-tests**: Executes unit tests.
 - **deploy-lambda**: Deploys all AWS resources using Terraform.
 - **destroy-lambda**: Tears down all infrastructure.
 
