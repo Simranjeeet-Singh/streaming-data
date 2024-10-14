@@ -38,3 +38,17 @@ src/charset_normalizer-3.3.2.dist-info/
 src/idna-3.10.dist-info/
 src/requests-2.32.3.dist-info/
 src/urllib3-2.2.3.dist-info/
+src/boto3-1.28.0.dist-info/
+src/boto3/
+src/botocore-1.31.85.dist-info/
+src/botocore/
+src/charset_normalizer-3.4.0.dist-info/
+src/dateutil/
+src/jmespath-1.0.1.dist-info/
+src/jmespath/
+src/python_dateutil-2.9.0.post0.dist-info/
+src/s3transfer-0.6.2.dist-info/
+src/s3transfer/
+src/six-1.16.0.dist-info/
+src/six.py
+src/urllib3-2.0.7.dist-info/
