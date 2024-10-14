@@ -113,7 +113,8 @@ If the guardian api key is not passed through with terraform deployment then it 
 After deployment, the Terraform script will output the API Gateway URL that can be used to invoke the Lambda function using curl command stated in this section.
 The api gateway URL will be like : 
 
-```https://<api-id>.execute-api.<aws-region>.amazonaws.com/prod
+```
+https://<api-id>.execute-api.<aws-region>.amazonaws.com/prod
 ```
 The <api-id> can also be obtained from the AWS management console, and 'prod' is the stage name set up in the project.
 The following command invokes lambda function:
